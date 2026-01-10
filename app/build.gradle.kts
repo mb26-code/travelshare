@@ -50,5 +50,5 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
     //security
-    implementation("androidx.security:security-crypto:1.0.0")
+    implementation("androidx.security:security-crypto:1.1.0")
 }
