@@ -3,7 +3,6 @@ package dev.mb_labs.travelshare;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -12,15 +11,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import dev.mb_labs.travelshare.api.APIClient;
-import dev.mb_labs.travelshare.model.RegisterRequest;
-import dev.mb_labs.travelshare.model.User;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-public class ForgotPasswordActivity  extends AppCompatActivity {
+public class ForgotPasswordActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +25,18 @@ public class ForgotPasswordActivity  extends AppCompatActivity {
             return insets;
         });
 
-        //
+        EditText emailField = findViewById(R.id.et_forgot_email);
+        Button resetButton = findViewById(R.id.btn_reset_password);
+
+        resetButton.setOnClickListener(v -> {
+            String email = emailField.getText().toString().trim();
+            if (email.isEmpty()) {
+                Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show();
+            } else {
+
+                Toast.makeText(this, "Reset link sent to " + email, Toast.LENGTH_LONG).show();
+                finish();
+            }
+        });
     }
-
 }
-

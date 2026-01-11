@@ -7,14 +7,15 @@ public class User {
     private String email;
 
     @SerializedName("name")
-    private String username;
+    private String name;
 
     @SerializedName("profilePicture")
     private String profilePictureUrl;
 
     public int getId() { return id; }
     public String getEmail() { return email; }
-    public String getUsername() { return username; }
+
+    public String getName() { return name; }
     public String getProfilePictureUrl() { return profilePictureUrl; }
 }
 

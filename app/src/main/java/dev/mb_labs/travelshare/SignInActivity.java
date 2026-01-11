@@ -58,13 +58,18 @@ public class SignInActivity extends AppCompatActivity {
         });
 
         Button signedOutModeButton = findViewById(R.id.signedOutModeButton);
-
         signedOutModeButton.setOnClickListener(v -> {
             Intent intent = new Intent(SignInActivity.this, MainActivity.class);
-
             intent.putExtra("SIGNED_OUT_MODE", true);
             startActivity(intent);
             finish();
+        });
+
+        //link to "forgot password" screen
+        TextView forgotPasswordText = findViewById(R.id.forgotPasswordRedirectText);
+        forgotPasswordText.setOnClickListener(v -> {
+            Intent intent = new Intent(SignInActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -83,33 +88,31 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    //login successful
+
                     String token = response.body().getToken();
-                    saveTokenSecurely(token);
+                    String name = response.body().getUser().getName();
+                    String userEmail = response.body().getUser().getEmail();
 
-                    Toast.makeText(SignInActivity.this, "Hi!", Toast.LENGTH_SHORT).show();
+                    saveCredentialsSecurely(token, name, userEmail);
 
-                    //go to Main Activity
+                    Toast.makeText(SignInActivity.this, "Welcome " + name + "!", Toast.LENGTH_SHORT).show();
+
                     Intent intent = new Intent(SignInActivity.this, MainActivity.class);
-
-                    //clear the back stack so user cannot go back to login screen
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 } else {
-                    //login failed (ex: 401 Unauthorized)
                     Toast.makeText(SignInActivity.this, "Login failed: Invalid credentials", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
-                //network error
                 Toast.makeText(SignInActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void saveTokenSecurely(String token) {
+    private void saveCredentialsSecurely(String token, String name, String email) {
         try {
             MasterKey masterKey = new MasterKey.Builder(this)
                     .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -123,12 +126,14 @@ public class SignInActivity extends AppCompatActivity {
                     EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             );
 
-            sharedPreferences.edit().putString("auth_token", token).apply();
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("auth_token", token);
+            editor.putString("user_name", name);
+            editor.putString("user_email", email);
+            editor.apply();
 
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
-            //fallback to standard SharedPreferences in case of encryption error
         }
     }
 }
-
