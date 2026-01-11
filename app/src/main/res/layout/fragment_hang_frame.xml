@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -42,12 +43,16 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:textColorHint="@color/light_blue"
-            android:textColor="@color/dark_blue" >
+            app:hintTextColor="@color/light_blue"
+            app:boxStrokeColor="@color/light_blue"
+            app:cursorColor="@color/dark_blue">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Title" />
+                android:hint="Title"
+                android:textColor="@color/dark_blue"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -55,14 +60,18 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:textColorHint="@color/light_blue"
-            android:textColor="@color/dark_blue" >
+            app:hintTextColor="@color/light_blue"
+            app:boxStrokeColor="@color/light_blue"
+            app:cursorColor="@color/dark_blue">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Description"
                 android:gravity="top"
-                android:lines="3" />
+                android:lines="3"
+                android:textColor="@color/dark_blue"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -86,21 +95,24 @@
                 android:layout_height="wrap_content"
                 android:text="Public"
                 android:checked="true"
-                android:textColor="@color/dark_blue"/>
+                android:textColor="@color/dark_blue"
+                app:buttonTint="@color/dark_blue"/>
 
             <RadioButton
                 android:id="@+id/rb_group"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Group"
-                android:textColor="@color/dark_blue"/>
+                android:textColor="@color/dark_blue"
+                app:buttonTint="@color/dark_blue"/>
 
             <RadioButton
                 android:id="@+id/rb_private"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Private"
-                android:textColor="@color/dark_blue"/>
+                android:textColor="@color/dark_blue"
+                app:buttonTint="@color/dark_blue"/>
         </RadioGroup>
 
         <Button
