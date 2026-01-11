@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -23,13 +22,28 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
+
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import dev.mb_labs.travelshare.MapPickerActivity;
 import dev.mb_labs.travelshare.R;
 import dev.mb_labs.travelshare.SelectedPhotoAdapter;
+import dev.mb_labs.travelshare.api.APIClient;
+import dev.mb_labs.travelshare.model.Frame;
 import dev.mb_labs.travelshare.model.SelectedPhoto;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HangFrameFragment extends Fragment {
 
@@ -43,7 +57,23 @@ public class HangFrameFragment extends Fragment {
 
     private ActivityResultLauncher<PickVisualMediaRequest> pickMultipleMedia;
 
+    private int currentEditingPosition = -1;
 
+    private final ActivityResultLauncher<Intent> mapPickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    double lat = result.getData().getDoubleExtra("LATITUDE", 0);
+                    double lng = result.getData().getDoubleExtra("LONGITUDE", 0);
+
+                    if (currentEditingPosition != -1 && currentEditingPosition < selectedPhotos.size()) {
+                        SelectedPhoto photo = selectedPhotos.get(currentEditingPosition);
+                        photo.setLocation(lat, lng);
+                        adapter.notifyItemChanged(currentEditingPosition);
+                    }
+                }
+            }
+    );
 
     @Nullable
     @Override
@@ -59,18 +89,20 @@ public class HangFrameFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         adapter = new SelectedPhotoAdapter(getContext(), selectedPhotos, (position, photo) -> {
-            //open Google Map Activity here to pick location manually
-
-            Toast.makeText(getContext(), "Open Map for photo " + position, Toast.LENGTH_SHORT).show();
+            currentEditingPosition = position;
+            Intent intent = new Intent(getContext(), MapPickerActivity.class);
+            if (photo.hasLocation()) {
+                intent.putExtra("LATITUDE", photo.getLatitude());
+                intent.putExtra("LONGITUDE", photo.getLongitude());
+            }
+            mapPickerLauncher.launch(intent);
         });
         recyclerView.setAdapter(adapter);
-
 
         pickMultipleMedia = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(8), uris -> {
             if (!uris.isEmpty()) {
                 for (Uri uri : uris) {
                     SelectedPhoto photo = new SelectedPhoto(uri);
-                    //try to extract EXIF data from the image
                     extractExifLocation(photo);
                     selectedPhotos.add(photo);
                 }
@@ -96,7 +128,6 @@ public class HangFrameFragment extends Fragment {
                 ExifInterface exif = new ExifInterface(inputStream);
                 float[] latLong = new float[2];
                 if (exif.getLatLong(latLong)) {
-                    //EXIF data found!
                     photo.setLocation(latLong[0], latLong[1]);
                 }
                 inputStream.close();
@@ -120,7 +151,6 @@ public class HangFrameFragment extends Fragment {
             return;
         }
 
-        //check if all of the photos have defined locations
         for (SelectedPhoto p : selectedPhotos) {
             if (!p.hasLocation()) {
                 Toast.makeText(getContext(), "Please set location for all photos", Toast.LENGTH_SHORT).show();
@@ -128,7 +158,72 @@ public class HangFrameFragment extends Fragment {
             }
         }
 
-        //prepare Multipart Request and call API
-        Toast.makeText(getContext(), "Ready to upload " + selectedPhotos.size() + " photos!", Toast.LENGTH_SHORT).show();
+        btnPostFrame.setEnabled(false);
+        Toast.makeText(getContext(), "Uploading...", Toast.LENGTH_SHORT).show();
+
+        try {
+            List<MultipartBody.Part> photoParts = new ArrayList<>();
+            List<Map<String, Double>> metadataList = new ArrayList<>();
+
+            for (SelectedPhoto photo : selectedPhotos) {
+                File file = getFileFromUri(photo.getUri());
+                RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), file);
+                MultipartBody.Part body = MultipartBody.Part.createFormData("photos", file.getName(), requestFile);
+                photoParts.add(body);
+
+                Map<String, Double> meta = new HashMap<>();
+                meta.put("latitude", photo.getLatitude());
+                meta.put("longitude", photo.getLongitude());
+                metadataList.add(meta);
+            }
+
+            String metadataJson = new Gson().toJson(metadataList);
+
+            RequestBody titlePart = RequestBody.create(MediaType.parse("text/plain"), title);
+            RequestBody descPart = RequestBody.create(MediaType.parse("text/plain"), description);
+            RequestBody visPart = RequestBody.create(MediaType.parse("text/plain"), visibility);
+            RequestBody metaPart = RequestBody.create(MediaType.parse("text/plain"), metadataJson);
+
+            APIClient.getInstance().createFrame(titlePart, descPart, visPart, metaPart, photoParts).enqueue(new Callback<Frame>() {
+                @Override
+                public void onResponse(Call<Frame> call, Response<Frame> response) {
+                    btnPostFrame.setEnabled(true);
+                    if (response.isSuccessful()) {
+                        Toast.makeText(getContext(), "Frame posted!", Toast.LENGTH_LONG).show();
+                        etTitle.setText("");
+                        etDescription.setText("");
+                        selectedPhotos.clear();
+                        adapter.notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(getContext(), "Upload failed: " + response.code(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Frame> call, Throwable t) {
+                    btnPostFrame.setEnabled(true);
+                    Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } catch (Exception e) {
+            btnPostFrame.setEnabled(true);
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Error preparing files", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private File getFileFromUri(Uri uri) throws Exception {
+        InputStream is = getContext().getContentResolver().openInputStream(uri);
+        File file = new File(getContext().getCacheDir(), "upload_" + System.currentTimeMillis() + ".jpg");
+        FileOutputStream fos = new FileOutputStream(file);
+        byte[] buffer = new byte[4096];
+        int bytesRead;
+        while ((bytesRead = is.read(buffer)) != -1) {
+            fos.write(buffer, 0, bytesRead);
+        }
+        fos.close();
+        is.close();
+        return file;
     }
 }
