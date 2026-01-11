@@ -51,4 +51,7 @@ dependencies {
 
     //security
     implementation("androidx.security:security-crypto:1.1.0")
+
+    implementation("androidx.exifinterface:exifinterface:1.3.7")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
 }
