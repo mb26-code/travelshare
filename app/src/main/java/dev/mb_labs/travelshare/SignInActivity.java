@@ -56,6 +56,16 @@ public class SignInActivity extends AppCompatActivity {
             Intent intent = new Intent(SignInActivity.this, SignUpActivity.class);
             startActivity(intent);
         });
+
+        Button signedOutModeButton = findViewById(R.id.signedOutModeButton);
+
+        signedOutModeButton.setOnClickListener(v -> {
+            Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+
+            intent.putExtra("SIGNED_OUT_MODE", true);
+            startActivity(intent);
+            finish();
+        });
     }
 
     private void login() {

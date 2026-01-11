@@ -3,6 +3,7 @@ package dev.mb_labs.travelshare;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,12 +24,16 @@ import dev.mb_labs.travelshare.fragments.SearchFragment;
 public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
+    private boolean inSignedOutMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!isUserLoggedIn()) {
+        //check if we are in signed out mode (passed from SignInActivity)
+        inSignedOutMode = getIntent().getBooleanExtra("SIGNED_OUT_MODE", false);
+
+        if (!inSignedOutMode && !isUserLoggedIn()) {
             redirectToLogin();
             return;
         }
@@ -36,13 +41,22 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_main), (v, insets) -> {
-            androidx.core.graphics.Insets systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
+
+        //if in signed out mode, hide specific menu items
+        if (inSignedOutMode) {
+            bottomNavigationView.getMenu().findItem(R.id.nav_hang_frame).setVisible(false);
+            bottomNavigationView.getMenu().findItem(R.id.nav_profile).setVisible(false);
+
+            Toast.makeText(this, "Signed out Mode: read only", Toast.LENGTH_LONG).show();
+        }
+
         bottomNavigationView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
             int itemId = item.getItemId();
@@ -65,11 +79,10 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        //default fragment
+        //default fragment = feed wall
         if (savedInstanceState == null) {
             bottomNavigationView.setSelectedItemId(R.id.nav_feed_wall);
         }
-
     }
 
     private boolean isUserLoggedIn() {
@@ -96,5 +109,4 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-
 }
