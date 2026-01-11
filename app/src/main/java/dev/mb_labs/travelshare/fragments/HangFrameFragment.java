@@ -2,6 +2,10 @@ package dev.mb_labs.travelshare.fragments;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -21,6 +25,9 @@ import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKey;
+import android.os.ParcelFileDescriptor;
 
 import com.google.gson.Gson;
 
@@ -137,9 +144,35 @@ public class HangFrameFragment extends Fragment {
         }
     }
 
+    private String getToken() {
+        try {
+            MasterKey masterKey = new MasterKey.Builder(getContext())
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build();
+
+            SharedPreferences sharedPreferences = EncryptedSharedPreferences.create(
+                    getContext(),
+                    "secure_prefs",
+                    masterKey,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            );
+            return sharedPreferences.getString("auth_token", null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private void postFrame() {
         String title = etTitle.getText().toString();
         String description = etDescription.getText().toString();
+
+        String token = getToken();
+        if (token == null) {
+            Toast.makeText(getContext(), "Error: You are not logged in!", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         String visibility = "public";
         int selectedId = radioGroupVisibility.getCheckedRadioButtonId();
@@ -167,6 +200,8 @@ public class HangFrameFragment extends Fragment {
 
             for (SelectedPhoto photo : selectedPhotos) {
                 File file = getFileFromUri(photo.getUri());
+                if (file == null) throw new Exception("Failed to process image");
+
                 RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), file);
                 MultipartBody.Part body = MultipartBody.Part.createFormData("photos", file.getName(), requestFile);
                 photoParts.add(body);
@@ -184,7 +219,7 @@ public class HangFrameFragment extends Fragment {
             RequestBody visPart = RequestBody.create(MediaType.parse("text/plain"), visibility);
             RequestBody metaPart = RequestBody.create(MediaType.parse("text/plain"), metadataJson);
 
-            APIClient.getInstance().createFrame(titlePart, descPart, visPart, metaPart, photoParts).enqueue(new Callback<Frame>() {
+            APIClient.getInstance().createFrame("Bearer " + token, titlePart, descPart, visPart, metaPart, photoParts).enqueue(new Callback<Frame>() {
                 @Override
                 public void onResponse(Call<Frame> call, Response<Frame> response) {
                     btnPostFrame.setEnabled(true);
@@ -214,16 +249,61 @@ public class HangFrameFragment extends Fragment {
     }
 
     private File getFileFromUri(Uri uri) throws Exception {
+        //EXIF orientation
+        InputStream isForExif = getContext().getContentResolver().openInputStream(uri);
+        ExifInterface exif = new ExifInterface(isForExif);
+        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+        isForExif.close();
+
+        //decode image
         InputStream is = getContext().getContentResolver().openInputStream(uri);
+        Bitmap bitmap = BitmapFactory.decodeStream(is);
+        is.close();
+
+        if (bitmap == null) return null;
+
+        //correct rotation if necessary
+        bitmap = rotateBitmap(bitmap, orientation);
+
+        //resize it if too big
+        int maxDimension = 1280;
+        if (bitmap.getWidth() > maxDimension || bitmap.getHeight() > maxDimension) {
+            float ratio = Math.min(
+                    (float) maxDimension / bitmap.getWidth(),
+                    (float) maxDimension / bitmap.getHeight()
+            );
+            bitmap = Bitmap.createScaledBitmap(
+                    bitmap,
+                    Math.round(bitmap.getWidth() * ratio),
+                    Math.round(bitmap.getHeight() * ratio),
+                    true
+            );
+        }
+
+        //save
         File file = new File(getContext().getCacheDir(), "upload_" + System.currentTimeMillis() + ".jpg");
         FileOutputStream fos = new FileOutputStream(file);
-        byte[] buffer = new byte[4096];
-        int bytesRead;
-        while ((bytesRead = is.read(buffer)) != -1) {
-            fos.write(buffer, 0, bytesRead);
-        }
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, fos);
         fos.close();
-        is.close();
+
         return file;
+    }
+
+    private Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
+        Matrix matrix = new Matrix();
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.postRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.postRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.postRotate(270);
+                break;
+            default:
+                return bitmap;
+        }
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 }
