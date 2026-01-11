@@ -1,4 +1,4 @@
-package dev.mb_labs.travelshare;
+package dev.mb_labs.travelshare.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -20,6 +20,8 @@ import java.util.Locale;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 
+import dev.mb_labs.travelshare.activities.MainActivity;
+import dev.mb_labs.travelshare.R;
 import dev.mb_labs.travelshare.model.Frame;
 
 public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.CarouselViewHolder> {

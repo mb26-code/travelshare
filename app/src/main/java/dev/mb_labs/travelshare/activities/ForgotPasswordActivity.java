@@ -1,4 +1,4 @@
-package dev.mb_labs.travelshare;
+package dev.mb_labs.travelshare.activities;
 
 import android.os.Bundle;
 import android.widget.Button;
@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import dev.mb_labs.travelshare.R;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 

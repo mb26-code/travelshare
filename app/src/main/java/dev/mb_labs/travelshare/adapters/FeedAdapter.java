@@ -1,4 +1,4 @@
-package dev.mb_labs.travelshare;
+package dev.mb_labs.travelshare.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import dev.mb_labs.travelshare.R;
 import dev.mb_labs.travelshare.model.Frame;
 
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder> {

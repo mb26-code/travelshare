@@ -1,4 +1,4 @@
-package dev.mb_labs.travelshare;
+package dev.mb_labs.travelshare.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +19,7 @@ import androidx.security.crypto.MasterKey;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import dev.mb_labs.travelshare.R;
 import dev.mb_labs.travelshare.api.APIClient;
 import dev.mb_labs.travelshare.model.AuthResponse;
 import dev.mb_labs.travelshare.model.LoginRequest;

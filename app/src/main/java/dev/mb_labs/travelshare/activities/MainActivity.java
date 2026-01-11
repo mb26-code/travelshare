@@ -1,4 +1,4 @@
-package dev.mb_labs.travelshare;
+package dev.mb_labs.travelshare.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +19,7 @@ import androidx.security.crypto.MasterKey;
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import dev.mb_labs.travelshare.R;
 import dev.mb_labs.travelshare.fragments.FeedWallFragment;
 import dev.mb_labs.travelshare.fragments.HangFrameFragment;
 import dev.mb_labs.travelshare.fragments.ProfileFragment;

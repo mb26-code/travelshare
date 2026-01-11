@@ -37,9 +37,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import dev.mb_labs.travelshare.MapPickerActivity;
+import dev.mb_labs.travelshare.activities.MapPickerActivity;
 import dev.mb_labs.travelshare.R;
-import dev.mb_labs.travelshare.SelectedPhotoAdapter;
+import dev.mb_labs.travelshare.adapters.SelectedPhotoAdapter;
 import dev.mb_labs.travelshare.api.APIClient;
 import dev.mb_labs.travelshare.model.Frame;
 import dev.mb_labs.travelshare.model.SelectedPhoto;

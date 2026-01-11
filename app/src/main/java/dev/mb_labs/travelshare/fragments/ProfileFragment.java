@@ -17,7 +17,7 @@ import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKey;
 
 import dev.mb_labs.travelshare.R;
-import dev.mb_labs.travelshare.SignInActivity;
+import dev.mb_labs.travelshare.activities.SignInActivity;
 
 public class ProfileFragment extends Fragment {
 

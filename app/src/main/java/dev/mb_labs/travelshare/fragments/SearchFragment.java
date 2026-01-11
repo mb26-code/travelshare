@@ -1,6 +1,5 @@
 package dev.mb_labs.travelshare.fragments;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.mb_labs.travelshare.FeedAdapter;
+import dev.mb_labs.travelshare.adapters.FeedAdapter;
 import dev.mb_labs.travelshare.R;
 import dev.mb_labs.travelshare.api.APIClient;
 import dev.mb_labs.travelshare.model.Frame;

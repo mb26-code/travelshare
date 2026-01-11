@@ -1,4 +1,4 @@
-package dev.mb_labs.travelshare;
+package dev.mb_labs.travelshare.activities;
 
 import android.os.Bundle;
 import android.widget.Button;
@@ -12,6 +12,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import dev.mb_labs.travelshare.R;
 import dev.mb_labs.travelshare.api.APIClient;
 import dev.mb_labs.travelshare.model.RegisterRequest;
 import dev.mb_labs.travelshare.model.User;

@@ -20,16 +20,16 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
 
-        <activity android:name=".SignInActivity" android:exported="true">
+        <activity android:name=".activities.SignInActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SignUpActivity" />
-        <activity android:name=".MainActivity" />
-        <activity android:name=".MapPickerActivity" />
-        <activity android:name=".ForgotPasswordActivity" />
+        <activity android:name=".activities.SignUpActivity" />
+        <activity android:name=".activities.MainActivity" />
+        <activity android:name=".activities.MapPickerActivity" />
+        <activity android:name=".activities.ForgotPasswordActivity" />
 
     </application>
 
