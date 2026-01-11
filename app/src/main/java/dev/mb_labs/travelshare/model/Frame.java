@@ -22,8 +22,16 @@ public class Frame {
     @SerializedName("photoMetadata")
     private String photoMetadata;
 
-    private int userId;
+    @SerializedName("created_at")
     private String createdAt;
+
+
+    private boolean isLiked = false;
+
+    public boolean isLiked() { return isLiked; }
+    public void setLiked(boolean liked) { isLiked = liked; }
+
+    private int userId;
 
 
     public int getId() { return id; }
@@ -41,11 +49,24 @@ public class Frame {
     public static class Photo {
         private int id;
 
+        public int getId() {
+            return id;
+        }
+
         @SerializedName("image")
         private String filename;
 
         private double latitude;
+
+        public double getLatitude() {
+            return latitude;
+        }
+
         private double longitude;
+
+        public double getLongitude() {
+            return longitude;
+        }
 
         public String getFilename() { return filename; }
     }
