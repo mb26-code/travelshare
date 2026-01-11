@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -74,7 +73,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
     private void updateLikeIcon(ImageView view, boolean isLiked) {
         if (isLiked) {
             view.setImageResource(R.drawable.icon_full_heart);
-            view.setColorFilter(ContextCompat.getColor(context, R.color.colorAccent));
+            view.setColorFilter(ContextCompat.getColor(context, R.color.neon_green));
         } else {
             view.setImageResource(R.drawable.icon_hollow_heart);
             view.setColorFilter(ContextCompat.getColor(context, R.color.black));

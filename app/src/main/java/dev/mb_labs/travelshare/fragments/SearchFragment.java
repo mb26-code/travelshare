@@ -1,9 +1,11 @@
 package dev.mb_labs.travelshare.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -11,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -54,6 +57,24 @@ public class SearchFragment extends Fragment {
 
         return view;
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        SearchView searchView = view.findViewById(R.id.searchView);
+
+        EditText searchEditText = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+
+        searchEditText.setTextColor(
+                ContextCompat.getColor(requireContext(), R.color.dark_blue)
+        );
+
+        searchEditText.setHintTextColor(
+                ContextCompat.getColor(requireContext(), R.color.light_blue)
+        );
+    }
+
 
     private void setupSearchListener() {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {

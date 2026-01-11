@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorBackground">#F5F7FA</color>
-    <color name="colorPrimary">#000096</color>
-    <color name="colorAccent">#27C927</color>
-
-    <color name="colorAlert">#C61212</color>
-    <color name="lightBlue">#4E89EB</color>
-
-
+    <color name="background">#F5F7FA</color>
+    <color name="dark_blue">#000096</color>
+    <color name="neon_green">#27C927</color>
+    <color name="dark_red">#C61212</color>
+    <color name="light_blue">#4E89EB</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#333333</color>
     <color name="gray">#606060</color>
