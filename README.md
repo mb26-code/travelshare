@@ -72,7 +72,7 @@ The application is built using native Android technologies and follows modern de
 This Android client relies on a dedicated backend service for data persistence, authentication, and media storage. The backend is built with **Node.js**, **Express**, and **MySQL**.
 
 You can find the backend source code and documentation here:
-👉 **[TravelShare API Repository](https://www.google.com/search?q=https://github.com/YourUsername/TravelShare-API)** *(Replace with actual link)*
+👉 **[TravelShare API Repository](https://github.com/mb26-code/travelshare-api)**
 
 The API documentation is also available locally in `TravelShare_API_documentation.md`.
 
