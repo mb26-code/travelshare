@@ -20,9 +20,9 @@
         android:paddingBottom="6dp">
 
         <ImageView
-            android:id="@+id/frame_author_profile_picture"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:id="@+id/frame_author_avatar"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:background="#DDDDDD"
             android:src="@android:drawable/sym_def_app_icon" />
 
@@ -36,21 +36,13 @@
                 android:id="@+id/frame_author_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Delphine"
+                android:text="Kirsten"
                 android:textStyle="bold"
                 android:textColor="@color/black"
                 android:textSize="16sp"/>
 
             <TextView
-                android:id="@+id/frame_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Montpellier, France"
-                android:textColor="@color/gray"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/frame_datetime"
+                android:id="@+id/frame_hanging_date_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="03/12/2025 at 12:05"
@@ -96,17 +88,17 @@
         <FrameLayout
             android:id="@+id/media_container_frame"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="400dp"
             android:background="#EEEEEE">
 
             <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/media_carousel"
+                android:id="@+id/photo_carousel"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:listitem="@layout/item_carousel_image" />
+                android:layout_height="400dp"
+                android:layout_marginTop="8dp"/>
 
             <ImageView
-                android:id="@+id/action_like_post"
+                android:id="@+id/like_button"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:paddingRight="5dp"
@@ -124,7 +116,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/action_open_comments"
+        android:id="@+id/comments_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="6dp"
@@ -133,7 +125,7 @@
         android:foreground="?attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
-        android:contentDescription="Ouvrir les commentaires">
+        android:contentDescription="Open comment section">
 
         <TextView
             android:layout_width="match_parent"
