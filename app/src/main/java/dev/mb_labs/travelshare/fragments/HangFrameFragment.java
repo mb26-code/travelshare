@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -27,8 +25,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKey;
-import android.os.ParcelFileDescriptor;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 
 import java.io.File;
@@ -167,8 +165,8 @@ public class HangFrameFragment extends Fragment {
     private void postFrame() {
         String title = etTitle.getText().toString();
         String description = etDescription.getText().toString();
-
         String token = getToken();
+
         if (token == null) {
             Toast.makeText(getContext(), "Error: You are not logged in!", Toast.LENGTH_SHORT).show();
             return;
@@ -192,118 +190,96 @@ public class HangFrameFragment extends Fragment {
         }
 
         btnPostFrame.setEnabled(false);
-        Toast.makeText(getContext(), "Uploading...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Processing images & Uploading...", Toast.LENGTH_SHORT).show();
 
-        try {
-            List<MultipartBody.Part> photoParts = new ArrayList<>();
-            List<Map<String, Double>> metadataList = new ArrayList<>();
 
-            for (SelectedPhoto photo : selectedPhotos) {
-                File file = getFileFromUri(photo.getUri());
-                if (file == null) throw new Exception("Failed to process image");
+        String finalVisibility = visibility;
 
-                RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), file);
-                MultipartBody.Part body = MultipartBody.Part.createFormData("photos", file.getName(), requestFile);
-                photoParts.add(body);
+        new Thread(() -> {
+            try {
+                List<MultipartBody.Part> photoParts = new ArrayList<>();
+                List<Map<String, Double>> metadataList = new ArrayList<>();
 
-                Map<String, Double> meta = new HashMap<>();
-                meta.put("latitude", photo.getLatitude());
-                meta.put("longitude", photo.getLongitude());
-                metadataList.add(meta);
-            }
+                for (SelectedPhoto photo : selectedPhotos) {
+                    File file = getFileFromUri(photo.getUri());
+                    if (file == null) throw new Exception("Failed to process image");
 
-            String metadataJson = new Gson().toJson(metadataList);
+                    RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), file);
+                    MultipartBody.Part body = MultipartBody.Part.createFormData("photos", file.getName(), requestFile);
+                    photoParts.add(body);
 
-            RequestBody titlePart = RequestBody.create(MediaType.parse("text/plain"), title);
-            RequestBody descPart = RequestBody.create(MediaType.parse("text/plain"), description);
-            RequestBody visPart = RequestBody.create(MediaType.parse("text/plain"), visibility);
-            RequestBody metaPart = RequestBody.create(MediaType.parse("text/plain"), metadataJson);
+                    Map<String, Double> meta = new HashMap<>();
+                    meta.put("latitude", photo.getLatitude());
+                    meta.put("longitude", photo.getLongitude());
+                    metadataList.add(meta);
+                }
 
-            APIClient.getInstance().createFrame("Bearer " + token, titlePart, descPart, visPart, metaPart, photoParts).enqueue(new Callback<Frame>() {
-                @Override
-                public void onResponse(Call<Frame> call, Response<Frame> response) {
-                    btnPostFrame.setEnabled(true);
-                    if (response.isSuccessful()) {
-                        Toast.makeText(getContext(), "Frame posted!", Toast.LENGTH_LONG).show();
-                        etTitle.setText("");
-                        etDescription.setText("");
-                        selectedPhotos.clear();
-                        adapter.notifyDataSetChanged();
-                    } else {
-                        Toast.makeText(getContext(), "Upload failed: " + response.code(), Toast.LENGTH_SHORT).show();
+                String metadataJson = new Gson().toJson(metadataList);
+
+                RequestBody titlePart = RequestBody.create(MediaType.parse("text/plain"), title);
+                RequestBody descPart = RequestBody.create(MediaType.parse("text/plain"), description);
+                RequestBody visPart = RequestBody.create(MediaType.parse("text/plain"), finalVisibility);
+                RequestBody metaPart = RequestBody.create(MediaType.parse("text/plain"), metadataJson);
+
+                APIClient.getInstance().createFrame("Bearer " + token, titlePart, descPart, visPart, metaPart, photoParts).enqueue(new Callback<Frame>() {
+                    @Override
+                    public void onResponse(Call<Frame> call, Response<Frame> response) {
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                btnPostFrame.setEnabled(true);
+                                if (response.isSuccessful()) {
+                                    Toast.makeText(getContext(), "Frame posted!", Toast.LENGTH_LONG).show();
+                                    etTitle.setText("");
+                                    etDescription.setText("");
+                                    selectedPhotos.clear();
+                                    adapter.notifyDataSetChanged();
+                                } else {
+                                    Toast.makeText(getContext(), "Upload failed: " + response.code(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     }
-                }
 
-                @Override
-                public void onFailure(Call<Frame> call, Throwable t) {
-                    btnPostFrame.setEnabled(true);
-                    Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+                    @Override
+                    public void onFailure(Call<Frame> call, Throwable t) {
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                btnPostFrame.setEnabled(true);
+                                Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    }
+                });
 
-        } catch (Exception e) {
-            btnPostFrame.setEnabled(true);
-            e.printStackTrace();
-            Toast.makeText(getContext(), "Error preparing files", Toast.LENGTH_SHORT).show();
-        }
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        btnPostFrame.setEnabled(true);
+                        Toast.makeText(getContext(), "Error processing images: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }
+        }).start();
     }
 
     private File getFileFromUri(Uri uri) throws Exception {
-        //EXIF orientation
-        InputStream isForExif = getContext().getContentResolver().openInputStream(uri);
-        ExifInterface exif = new ExifInterface(isForExif);
-        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-        isForExif.close();
+        //ask Glide to load the image for us.
+        //Glide handles automatically the EXIF rotation EXIF depending on the smartphone's manufacturer.
+        //.submit(1280, 1280) resizes the image to prevent a 413 error.
+        Bitmap bitmap = Glide.with(getContext())
+                .asBitmap()
+                .load(uri)
+                .submit(1280, 1280) //Max size = 1280px
+                .get();
 
-        //decode image
-        InputStream is = getContext().getContentResolver().openInputStream(uri);
-        Bitmap bitmap = BitmapFactory.decodeStream(is);
-        is.close();
-
-        if (bitmap == null) return null;
-
-        //correct rotation if necessary
-        bitmap = rotateBitmap(bitmap, orientation);
-
-        //resize it if too big
-        int maxDimension = 1280;
-        if (bitmap.getWidth() > maxDimension || bitmap.getHeight() > maxDimension) {
-            float ratio = Math.min(
-                    (float) maxDimension / bitmap.getWidth(),
-                    (float) maxDimension / bitmap.getHeight()
-            );
-            bitmap = Bitmap.createScaledBitmap(
-                    bitmap,
-                    Math.round(bitmap.getWidth() * ratio),
-                    Math.round(bitmap.getHeight() * ratio),
-                    true
-            );
-        }
-
-        //save
         File file = new File(getContext().getCacheDir(), "upload_" + System.currentTimeMillis() + ".jpg");
         FileOutputStream fos = new FileOutputStream(file);
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, fos);
+
+        //saving the clean bitmap (turned and resized by Glide)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 75, fos);
         fos.close();
 
         return file;
-    }
-
-    private Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
-        Matrix matrix = new Matrix();
-        switch (orientation) {
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                matrix.postRotate(90);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                matrix.postRotate(180);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                matrix.postRotate(270);
-                break;
-            default:
-                return bitmap;
-        }
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 }
