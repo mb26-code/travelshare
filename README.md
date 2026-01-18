@@ -125,4 +125,4 @@ private static final String BASE_URL = "http://10.0.2.2:3001/";
 
 ---
 
-*This project was developed as part of the Mobile Programming (HAI9261) course.*
+*This project was developed as part of the Mobile Programming (HAI926I) course.*
