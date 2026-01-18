@@ -30,6 +30,8 @@
         <activity android:name=".activities.MainActivity" />
         <activity android:name=".activities.MapPickerActivity" />
         <activity android:name=".activities.ForgotPasswordActivity" />
+        <activity android:name=".activities.VerificationActivity" />
+        <activity android:name=".activities.ResetPasswordActivity" />
 
     </application>
 

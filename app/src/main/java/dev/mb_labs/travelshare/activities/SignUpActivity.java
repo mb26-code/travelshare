@@ -1,5 +1,6 @@
 package dev.mb_labs.travelshare.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,7 +22,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SignUpActivity  extends AppCompatActivity {
+public class SignUpActivity extends AppCompatActivity {
 
     private EditText nameField, eMailField, passwordField, confirmPasswordField;
     private Button signUpButton;
@@ -73,7 +74,11 @@ public class SignUpActivity  extends AppCompatActivity {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(SignUpActivity.this, "Account created! Please log in.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SignUpActivity.this, "Account created! Please verify email.", Toast.LENGTH_LONG).show();
+                    //navigate to e-mail verification
+                    Intent intent = new Intent(SignUpActivity.this, VerificationActivity.class);
+                    intent.putExtra("EMAIL", email);
+                    startActivity(intent);
                     finish();
                 } else {
                     Toast.makeText(SignUpActivity.this, "Registration failed. Try a different email.", Toast.LENGTH_SHORT).show();

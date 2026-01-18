@@ -3,12 +3,16 @@ package dev.mb_labs.travelshare.api;
 import java.util.List;
 
 import dev.mb_labs.travelshare.model.AuthResponse;
+import dev.mb_labs.travelshare.model.ConfirmResetRequest;
 import dev.mb_labs.travelshare.model.Frame;
 import dev.mb_labs.travelshare.model.LoginRequest;
+import dev.mb_labs.travelshare.model.PasswordResetRequest;
 import dev.mb_labs.travelshare.model.RegisterRequest;
 import dev.mb_labs.travelshare.model.User;
+import dev.mb_labs.travelshare.model.VerifyRequest;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Header;
@@ -25,6 +29,15 @@ public interface TravelShareService {
 
     @POST("auth/register")
     Call<User> register(@Body RegisterRequest request);
+
+    @POST("auth/register/confirm")
+    Call<ResponseBody> verifyEmail(@Body VerifyRequest request);
+
+    @POST("auth/password-reset")
+    Call<ResponseBody> requestPasswordReset(@Body PasswordResetRequest request);
+
+    @POST("auth/password-reset/confirm")
+    Call<ResponseBody> confirmPasswordReset(@Body ConfirmResetRequest request);
 
     @GET("frames")
     Call<List<Frame>> getFrames();
