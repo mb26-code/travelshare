@@ -52,6 +52,8 @@ import retrofit2.Response;
 
 public class HangFrameFragment extends Fragment {
 
+    public final static int MAX_PHOTOS_PER_FRAME = 8;
+
     private EditText etTitle, etDescription;
     private RadioGroup radioGroupVisibility;
     private RecyclerView recyclerView;
@@ -104,7 +106,7 @@ public class HangFrameFragment extends Fragment {
         });
         recyclerView.setAdapter(adapter);
 
-        pickMultipleMedia = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(8), uris -> {
+        pickMultipleMedia = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(MAX_PHOTOS_PER_FRAME), uris -> {
             if (!uris.isEmpty()) {
                 for (Uri uri : uris) {
                     SelectedPhoto photo = new SelectedPhoto(uri);
