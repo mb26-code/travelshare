@@ -1,5 +1,6 @@
 package dev.mb_labs.travelshare.fragments;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,12 +17,13 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKey;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import dev.mb_labs.travelshare.adapters.FeedAdapter;
 import dev.mb_labs.travelshare.R;
+import dev.mb_labs.travelshare.adapters.FeedAdapter;
 import dev.mb_labs.travelshare.api.APIClient;
 import dev.mb_labs.travelshare.model.Frame;
 import retrofit2.Call;
@@ -40,20 +42,13 @@ public class SearchFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
-
         searchView = view.findViewById(R.id.searchView);
         recyclerView = view.findViewById(R.id.recyclerViewSearch);
         progressBar = view.findViewById(R.id.searchProgressBar);
         tvNoResults = view.findViewById(R.id.tvNoResults);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        //initialize adapter with empty list
-        adapter = new FeedAdapter(getContext(), new ArrayList<>());
-        recyclerView.setAdapter(adapter);
-
         setupSearchListener();
-
         return view;
     }
 
@@ -86,7 +81,6 @@ public class SearchFragment extends Fragment {
                 //hide keyboard
                 return true;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
                 //...
@@ -105,15 +99,13 @@ public class SearchFragment extends Fragment {
             @Override
             public void onResponse(Call<List<Frame>> call, Response<List<Frame>> response) {
                 progressBar.setVisibility(View.GONE);
-
                 if (response.isSuccessful() && response.body() != null) {
                     List<Frame> results = response.body();
-
                     if (results.isEmpty()) {
                         tvNoResults.setVisibility(View.VISIBLE);
                     } else {
-                        //re-use the FeedAdapter to display results
-                        adapter = new FeedAdapter(getContext(), results);
+                        boolean isGuest = !isUserLoggedIn();
+                        adapter = new FeedAdapter(getContext(), results, isGuest);
                         recyclerView.setAdapter(adapter);
                         recyclerView.setVisibility(View.VISIBLE);
                     }
@@ -128,5 +120,23 @@ public class SearchFragment extends Fragment {
                 Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private boolean isUserLoggedIn() {
+        try {
+            MasterKey masterKey = new MasterKey.Builder(getContext())
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build();
+            SharedPreferences sharedPreferences = EncryptedSharedPreferences.create(
+                    getContext(),
+                    "secure_prefs",
+                    masterKey,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            );
+            return sharedPreferences.contains("auth_token");
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

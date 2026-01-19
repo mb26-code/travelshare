@@ -25,6 +25,8 @@ import dev.mb_labs.travelshare.fragments.HangFrameFragment;
 import dev.mb_labs.travelshare.fragments.ProfileFragment;
 import dev.mb_labs.travelshare.fragments.SearchFragment;
 
+import androidx.activity.OnBackPressedCallback;
+
 public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
@@ -59,6 +61,23 @@ public class MainActivity extends AppCompatActivity {
             bottomNavigationView.getMenu().findItem(R.id.nav_profile).setVisible(false);
             Toast.makeText(this, "Signed out Mode: read only", Toast.LENGTH_LONG).show();
         }
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                //if we are not on the Feed Wall (Home) tab/fragment, go back to it
+                if (bottomNavigationView.getSelectedItemId() != R.id.nav_feed_wall) {
+                    bottomNavigationView.setSelectedItemId(R.id.nav_feed_wall);
+                } else {
+                    //if we are on the Feed Wall tab/fragment, allow standard exit
+                    if (isEnabled()) {
+                        setEnabled(false);
+                        getOnBackPressedDispatcher().onBackPressed();
+                    }
+                }
+            }
+        });
+
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;

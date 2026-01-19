@@ -37,6 +37,11 @@ public class SignInActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (checkAutoLogin()) {
+            return;
+        }
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_sign_in);
 
@@ -56,6 +61,7 @@ public class SignInActivity extends AppCompatActivity {
         signUpButton.setOnClickListener(v -> {
             Intent intent = new Intent(SignInActivity.this, SignUpActivity.class);
             startActivity(intent);
+            finish();
         });
 
         Button signedOutModeButton = findViewById(R.id.signedOutModeButton);
@@ -63,7 +69,7 @@ public class SignInActivity extends AppCompatActivity {
             Intent intent = new Intent(SignInActivity.this, MainActivity.class);
             intent.putExtra("SIGNED_OUT_MODE", true);
             startActivity(intent);
-            finish();
+            //finish();
         });
 
         //link to "forgot password" screen
@@ -72,6 +78,33 @@ public class SignInActivity extends AppCompatActivity {
             Intent intent = new Intent(SignInActivity.this, ForgotPasswordActivity.class);
             startActivity(intent);
         });
+    }
+
+    private boolean checkAutoLogin() {
+        try {
+            MasterKey masterKey = new MasterKey.Builder(this)
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build();
+
+            SharedPreferences sharedPreferences = EncryptedSharedPreferences.create(
+                    this,
+                    "secure_prefs",
+                    masterKey,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            );
+
+            if (sharedPreferences.contains("auth_token")) {
+                //token exists, go directly to Main
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+                finish(); //close sign in so you can't go back to it when logged in
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private void login() {

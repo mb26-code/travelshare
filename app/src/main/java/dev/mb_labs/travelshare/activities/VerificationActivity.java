@@ -40,7 +40,7 @@ public class VerificationActivity extends AppCompatActivity {
         email = getIntent().getStringExtra("EMAIL");
         TextView tvInfo = findViewById(R.id.tv_verification_info);
         if (email != null) {
-            tvInfo.setText("Please enter the code sent to " + email);
+            tvInfo.setText("Enter the code sent to \"" + email + "\"");
         }
 
         EditText etCode = findViewById(R.id.et_verification_code);

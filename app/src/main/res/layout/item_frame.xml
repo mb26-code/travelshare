@@ -7,8 +7,7 @@
     android:layout_height="wrap_content"
     android:background="@color/white"
     android:layout_marginBottom="16dp"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/frame_header"
@@ -36,81 +35,87 @@
                 android:id="@+id/frame_author_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Kirsten"
-                android:textStyle="bold"
+                android:text="User"
                 android:textColor="@color/black"
+                android:textStyle="bold"
                 android:textSize="16sp"/>
 
             <TextView
                 android:id="@+id/frame_hanging_date_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="03/12/2025 at 12:05"
-                android:textColor="@color/gray"
-                android:textSize="12sp" />
+                android:text="on 09/01/2026 at 21:27"
+                android:textSize="12sp"
+                android:textColor="@android:color/darker_gray"/>
         </LinearLayout>
-
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/frame_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="12dp"
+        android:text="Trip to Japan"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/frame_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="12dp"
+        android:paddingBottom="8dp"
+        android:text="Amazing view of the Tokyo Tower!"
+        android:textColor="@color/black"
+        android:textSize="14sp" />
+
     <LinearLayout
-        android:id="@+id/frame_content_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/frame_caption"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="12dp"
-            android:paddingBottom="5dp">
-
-            <TextView
-                android:id="@+id/frame_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Sunset by the beach"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="18sp"/>
-
-            <TextView
-                android:id="@+id/frame_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="The view was absolutely amazing today! #Beach #Travel"
-                android:textColor="@color/black"
-                android:textSize="15sp"/>
-
-        </LinearLayout>
-
         <FrameLayout
-            android:id="@+id/media_container_frame"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:background="#EEEEEE">
+            android:layout_height="350dp">
 
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/photo_carousel"
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
-                android:layout_marginTop="8dp"/>
+                android:layout_height="match_parent" />
 
-            <ImageView
-                android:id="@+id/like_button"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:paddingRight="5dp"
-                android:src="@drawable/icon_hollow_heart"
-                app:tint="@color/black"
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
-                android:layout_margin="10dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:focusable="true"
-                android:contentDescription="Liker"
-                tools:src="@drawable/icon_hollow_heart"/>
+                android:layout_margin="10dp">
+
+                <ImageView
+                    android:id="@+id/like_button"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/icon_hollow_heart"
+                    app:tint="@color/black"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="Like"/>
+
+                <TextView
+                    android:id="@+id/like_count_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="0"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:shadowColor="@color/black"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="2"/>
+            </FrameLayout>
+
         </FrameLayout>
 
     </LinearLayout>
@@ -119,7 +124,7 @@
         android:id="@+id/comments_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="6dp"
+        android:padding="8dp"
         android:gravity="center"
         android:background="@drawable/background_border"
         android:foreground="?attr/selectableItemBackground"
@@ -128,9 +133,10 @@
         android:contentDescription="Open comment section">
 
         <TextView
+            android:id="@+id/tv_comment_button_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Comments"
+            android:text="Comments (0)"
             android:textStyle="bold"
             android:textColor="@color/black"
             android:textAlignment="center"/>
