@@ -67,6 +67,9 @@ dependencies {
     implementation("androidx.exifinterface:exifinterface:1.3.7")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
 
+    //Google Places SDK
+    implementation("com.google.android.libraries.places:places:3.3.0")
+
     //Room Database
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")

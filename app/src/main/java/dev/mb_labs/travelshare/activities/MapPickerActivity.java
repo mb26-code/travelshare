@@ -1,6 +1,8 @@
 package dev.mb_labs.travelshare.activities;
 
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
@@ -18,6 +20,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+
+import java.util.Arrays;
 
 import dev.mb_labs.travelshare.R;
 
@@ -39,11 +47,9 @@ public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCa
             return insets;
         });
 
-        double lat = getIntent().getDoubleExtra("LATITUDE", 0);
-        double lng = getIntent().getDoubleExtra("LONGITUDE", 0);
-        if (lat != 0 && lng != 0) {
-            selectedLocation = new LatLng(lat, lng);
-        }
+        initializePlaces();
+
+        setupAutocomplete();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -65,6 +71,46 @@ public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCa
         });
     }
 
+    private void initializePlaces() {
+        if (!Places.isInitialized()) {
+            try {
+                ApplicationInfo ai = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
+                String apiKey = ai.metaData.getString("com.google.android.geo.API_KEY");
+                if (apiKey != null) {
+                    Places.initialize(getApplicationContext(), apiKey);
+                }
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void setupAutocomplete() {
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        if (autocompleteFragment != null) {
+            autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+            autocompleteFragment.setHint("Search city or place...");
+
+            autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+                @Override
+                public void onPlaceSelected(Place place) {
+                    if (place.getLatLng() != null) {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 15));
+                        selectedLocation = place.getLatLng();
+                        placeMarker(selectedLocation);
+                    }
+                }
+
+                @Override
+                public void onError(com.google.android.gms.common.api.Status status) {
+                    Toast.makeText(MapPickerActivity.this, "Error: " + status.getStatusMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -73,7 +119,7 @@ public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCa
             placeMarker(selectedLocation);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, 15));
         } else {
-            //default to France/Montpellier if no location set
+            //default to Montpellier, France
             LatLng defaultLoc = new LatLng(46.22, 2.21);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLoc, 5));
         }
