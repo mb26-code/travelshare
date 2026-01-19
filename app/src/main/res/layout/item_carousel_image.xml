@@ -17,34 +17,54 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <LinearLayout
-        android:id="@+id/gps_tag_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="#80000000"
-        android:padding="6dp"
-        android:layout_margin="10dp"
-        android:clickable="true"
-        android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <ImageView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:src="@android:drawable/ic_dialog_map"
-            app:tint="@android:color/white"
-            android:layout_gravity="center_vertical"/>
-
-        <TextView
-            android:id="@+id/gps_coordinates_text"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_gravity="center_vertical">
+        <LinearLayout
+            android:id="@+id/gps_tag_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="48.85, 2.35"
-            android:textColor="@android:color/white"
-            android:textSize="12sp"
-            android:layout_marginStart="4dp"
-            android:textStyle="bold"/>
+            android:orientation="horizontal"
+            android:background="#59000000"
+            android:padding="5dp"
+            android:layout_margin="10dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:id="@+id/gps_coordinates_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="48.85° N, 2.35° E"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btn_open_maps"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/icon_google_maps_pin_foreground"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="See location in Google Maps"
+            android:visibility="gone"
+            android:scaleX="2"
+            android:scaleY="2"
+            app:layout_constraintBottom_toBottomOf="@id/gps_tag_container"
+            app:layout_constraintStart_toEndOf="@id/gps_tag_container"/>
+
     </LinearLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
