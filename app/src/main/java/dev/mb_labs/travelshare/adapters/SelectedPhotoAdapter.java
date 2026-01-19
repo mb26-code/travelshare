@@ -44,13 +44,17 @@ public class SelectedPhotoAdapter extends RecyclerView.Adapter<SelectedPhotoAdap
         Glide.with(context).load(photo.getUri()).centerCrop().into(holder.thumbnail);
 
         if (photo.hasLocation()) {
-            holder.status.setText("Loc OK");
+            holder.status.setText("Location: OK");
             holder.status.setTextColor(context.getResources().getColor(android.R.color.holo_green_dark));
-            holder.mapIcon.setColorFilter(context.getResources().getColor(android.R.color.holo_green_dark));
+
+            holder.mapIcon.clearColorFilter();
+            holder.mapIcon.setImageResource(R.drawable.green_check_mark_icon);
         } else {
-            holder.status.setText("Set Loc");
+            holder.status.setText("Set Location");
             holder.status.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
-            holder.mapIcon.setColorFilter(context.getResources().getColor(android.R.color.darker_gray));
+
+            holder.mapIcon.clearColorFilter();
+            holder.mapIcon.setImageResource(R.drawable.red_cross_icon);
         }
 
         holder.mapIcon.setOnClickListener(v -> locationListener.onLocationClick(position, photo));
