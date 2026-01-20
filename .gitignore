@@ -25,3 +25,8 @@ settings.gradle.kts
 scripts/
 docs/
 /README_TravelShare_App.md
+
+# ignore APKs and release files
+*.apk
+app/release/
+output-metadata.json
