@@ -89,7 +89,7 @@ To build and run this project locally, follow these steps:
 ### 2. Clone the Repository
 
 ```bash
-git clone https://github.com/YourUsername/TravelShare.git
+git clone https://github.com/mb26-code/travelshare.git
 
 ```
 
@@ -101,7 +101,7 @@ Create a file named `local.properties` in the root directory of the project (if 
 
 ```properties
 sdk.dir=/path/to/your/android/sdk
-MAPS_API_KEY=AIzaSyYourSecretAPIKeyHere
+MAPS_API_KEY=AIzaSy_YourSecretAPIKeyHere
 
 ```
 
